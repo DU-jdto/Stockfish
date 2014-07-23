@@ -762,7 +762,6 @@ moves_loop: // When in check and at SpNode search starts from here
       // ttValue minus a margin then we extend the ttMove.
       if (    singularExtensionNode
           &&  move == ttMove
-          && !ext
           &&  pos.legal(move, ci.pinned))
       {
           Value rBeta = ttValue - int(depth);
@@ -773,7 +772,7 @@ moves_loop: // When in check and at SpNode search starts from here
           ss->excludedMove = MOVE_NONE;
 
           if (value < rBeta)
-              ext = ONE_PLY;
+              ext = std::max(ext + ONE_PLY / 2, ONE_PLY);
       }
 
       // Update the current move (this must be done after singular extension search)
