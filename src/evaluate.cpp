@@ -215,8 +215,10 @@ namespace {
   template<Color Us>
   void init_eval_info(const Position& pos, EvalInfo& ei) {
 
-    const Color  Them = (Us == WHITE ? BLACK   : WHITE);
-    const Square Down = (Us == WHITE ? DELTA_S : DELTA_N);
+    const Color  Them      = (Us == WHITE ? BLACK    : WHITE);
+    const Square Down      = (Us == WHITE ? DELTA_S  : DELTA_N);
+    const Square DownRight = (Us == WHITE ? DELTA_SW : DELTA_NE);
+    const Square DownLeft  = (Us == WHITE ? DELTA_SE : DELTA_NW);
 
     ei.pinnedPieces[Us] = pos.pinned_pieces(Us);
     ei.attackedBy[Us][ALL_PIECES] = ei.attackedBy[Us][PAWN] = ei.pi->pawn_attacks(Us);
@@ -225,8 +227,8 @@ namespace {
     // Init king safety tables only if we are going to use them
     if (pos.non_pawn_material(Us) >= QueenValueMg)
     {
-        ei.kingRing[Them] = b | shift_bb<Down>(b);
-        b &= ei.attackedBy[Us][PAWN];
+        ei.kingRing[Them] = b |= shift_bb<Down>(b);
+        b = (shift_bb<DownRight>(b) | shift_bb<DownLeft>(b)) & pos.pieces(Us, PAWN);
         ei.kingAttackersCount[Us] = b ? popcount<Max15>(b) : 0;
         ei.kingAdjacentZoneAttacksCount[Us] = ei.kingAttackersWeight[Us] = 0;
     }
