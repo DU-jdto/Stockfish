@@ -198,7 +198,7 @@ namespace {
   Score KingDanger[512];
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
-  const int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 7, 5, 4, 1 };
+  const int KingAttackWeights[PIECE_TYPE_NB] = { 0, 1, 7, 5, 4, 1 };
 
   // Penalties for enemy's safe checks
   const int QueenContactCheck = 89;
@@ -230,7 +230,8 @@ namespace {
         ei.kingRing[Them] = b |= shift_bb<Down>(b);
         b = (shift_bb<DownRight>(b) | shift_bb<DownLeft>(b)) & pos.pieces(Us, PAWN);
         ei.kingAttackersCount[Us] = b ? popcount<Max15>(b) : 0;
-        ei.kingAdjacentZoneAttacksCount[Us] = ei.kingAttackersWeight[Us] = 0;
+        ei.kingAttackersWeight[Us] = ei.kingAttackersCount[Us] * KingAttackWeights[PAWN];
+        ei.kingAdjacentZoneAttacksCount[Us] = 0;
     }
     else
         ei.kingRing[Them] = ei.kingAttackersCount[Us] = 0;
