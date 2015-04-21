@@ -50,8 +50,8 @@ namespace {
   { S(40, 38), S(49, 41), S(53, 41), S(53, 41),
     S(53, 41), S(53, 41), S(49, 41), S(40, 38) } };
 
-  // Connected pawn bonus by opposed, phalanx, twice supported and rank
-  Score Connected[2][2][2][RANK_NB];
+  // Connected pawn bonus by opposed, twice connected and rank
+  Score Connected[2][2][RANK_NB];
 
   // Levers bonus by rank
   const Score Lever[RANK_NB] = {
@@ -110,9 +110,9 @@ namespace {
     const Square Right = (Us == WHITE ? DELTA_NE : DELTA_SW);
     const Square Left  = (Us == WHITE ? DELTA_NW : DELTA_SE);
 
-    Bitboard b, neighbours, doubled, supported, phalanx;
+    Bitboard b, neighbours, doubled, supported, phalanx, connected;
     Square s;
-    bool passed, isolated, opposed, backward, lever, connected;
+    bool passed, isolated, opposed, backward, lever;
     Score score = SCORE_ZERO;
     const Square* pl = pos.list<PAWN>(Us);
     const Bitboard* pawnAttacksBB = StepAttacksBB[make_piece(Us, PAWN)];
@@ -188,7 +188,7 @@ namespace {
             score -= UnsupportedPawnPenalty;
 
         if (connected)
-            score += Connected[opposed][!!phalanx][more_than_one(supported)][relative_rank(Us, s)];
+            score += Connected[opposed][more_than_one(connected)][relative_rank(Us, s)];
 
         if (doubled)
             score -= Doubled[f] / distance<Rank>(s, frontmost_sq(Us, doubled));
@@ -217,16 +217,15 @@ namespace Pawns {
 
 void init()
 {
-  static const int Seed[RANK_NB] = { 0, 6, 15, 10, 57, 75, 135, 258 };
+  static const int Seed[RANK_NB] = { 0, 10, 13, 33, 66, 105, 196, 0 };
 
   for (int opposed = 0; opposed <= 1; ++opposed)
-      for (int phalanx = 0; phalanx <= 1; ++phalanx)
-          for (int apex = 0; apex <= 1; ++apex)
-              for (Rank r = RANK_2; r < RANK_8; ++r)
+      for (int twice = 0; twice <= 1; ++twice)
+          for (Rank r = RANK_2; r < RANK_8; ++r)
   {
-      int v = (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
-      v += (apex ? v / 2 : 0);
-      Connected[opposed][phalanx][apex][r] = make_score(3 * v / 2, v);
+      int v = Seed[r] >> opposed;
+      v += (twice ? v / 2 : 0);
+      Connected[opposed][twice][r] = make_score(3 * v / 2, v);
   }
 }
 
