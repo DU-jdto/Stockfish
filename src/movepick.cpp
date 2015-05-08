@@ -149,7 +149,7 @@ void MovePicker::score<CAPTURES>() {
   // calls in case we get a cutoff.
   for (auto& m : *this)
       m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
-               - distance(pos.king_square(pos.side_to_move()), to_sq(m));
+               - PawnValueMg * distance(pos.king_square(pos.side_to_move()), to_sq(m));
 }
 
 template<>
