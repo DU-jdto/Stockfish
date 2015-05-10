@@ -344,6 +344,7 @@ namespace {
     EasyMove.clear();
 
     std::memset(ss-2, 0, 5 * sizeof(Stack));
+    (ss-2)->staticEval = (ss-1)->staticEval = VALUE_NONE;
 
     depth = DEPTH_ZERO;
     BestMoveChanges = 0;
