@@ -700,6 +700,24 @@ namespace {
             return v;
     }
 
+    // Step 10. Internal iterative deepening (skipped when in check)
+    if (    depth >= (PvNode ? 5 * ONE_PLY : 8 * ONE_PLY)
+        && !ttMove
+        && (PvNode || ss->staticEval + 256 >= beta))
+    {
+        Depth d = 2 * (depth - 2 * ONE_PLY) - (PvNode ? DEPTH_ZERO : depth / 2);
+        ss->skipEarlyPruning = true;
+        search<PvNode ? PV : NonPV, false>(pos, ss, alpha, beta, d / 2, true);
+        ss->skipEarlyPruning = false;
+
+        tte = TT.probe(posKey, ttHit);
+        ttMove = ttHit ? tte->move() : MOVE_NONE;
+        ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+        if (ttValue != VALUE_NONE)
+            if (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER))
+                eval = ttValue;
+    }
+
     // Step 7. Futility pruning: child node (skipped when in check)
     if (   !RootNode
         &&  depth < 7 * ONE_PLY
@@ -776,20 +794,6 @@ namespace {
                 if (value >= rbeta)
                     return value;
             }
-    }
-
-    // Step 10. Internal iterative deepening (skipped when in check)
-    if (    depth >= (PvNode ? 5 * ONE_PLY : 8 * ONE_PLY)
-        && !ttMove
-        && (PvNode || ss->staticEval + 256 >= beta))
-    {
-        Depth d = 2 * (depth - 2 * ONE_PLY) - (PvNode ? DEPTH_ZERO : depth / 2);
-        ss->skipEarlyPruning = true;
-        search<PvNode ? PV : NonPV, false>(pos, ss, alpha, beta, d / 2, true);
-        ss->skipEarlyPruning = false;
-
-        tte = TT.probe(posKey, ttHit);
-        ttMove = ttHit ? tte->move() : MOVE_NONE;
     }
 
 moves_loop: // When in check and at SpNode search starts from here
