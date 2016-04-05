@@ -614,7 +614,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth, predictedDepth;
     Value bestValue, value, ttValue, eval, nullValue, futilityValue;
-    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
+    bool ttHit, inCheck, givesCheck, singularExtensionNode, singularExtended, improving;
     bool captureOrPromotion, doFullDepthSearch;
     int moveCount, quietCount;
 
@@ -888,6 +888,7 @@ moves_loop: // When in check search starts from here
                            && !excludedMove // Recursive singular search is not allowed
                            && (tte->bound() & BOUND_LOWER)
                            &&  tte->depth() >= depth - 3 * ONE_PLY;
+    singularExtended = false;
 
     // Step 11. Loop through moves
     // Loop through all pseudo-legal moves until no moves remain or a beta cutoff occurs
@@ -943,8 +944,11 @@ moves_loop: // When in check search starts from here
           ss->skipEarlyPruning = false;
           ss->excludedMove = MOVE_NONE;
 
-          if (value < rBeta)
-              extension = ONE_PLY;
+		  if (value < rBeta)
+		  {
+			  extension = ONE_PLY;
+			  singularExtended = true;
+		  }
       }
 
       // Update the current move (this must be done after singular extension search)
@@ -1016,7 +1020,8 @@ moves_loop: // When in check search starts from here
 
           // Increase reduction for cut nodes and moves with a bad history
           if (   (!PvNode && cutNode)
-              || (hValue < VALUE_ZERO && cmhValue <= VALUE_ZERO))
+              || (hValue < VALUE_ZERO && cmhValue <= VALUE_ZERO)
+			  ||  singularExtended)
               r += ONE_PLY;
 
           // Decrease/increase reduction for moves with a good/bad history
