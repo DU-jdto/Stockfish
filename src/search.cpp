@@ -1341,10 +1341,11 @@ moves_loop: // When in check search starts from here
     if (InCheck && bestValue == -VALUE_INFINITE)
         return mated_in(ss->ply); // Plies to mate from the root
 
-    tte->save(posKey, value_to_tt(bestValue, ss->ply),
-              Bound(  (PvNode  && bestValue > oldAlpha        ? BOUND_LOWER : BOUND_NONE)
-                    | (InCheck || depth > DEPTH_QS_RECAPTURES ? BOUND_UPPER : BOUND_NONE)),
-              ttDepth, bestMove, ss->staticEval, TT.generation());
+    Bound bound = Bound(  (PvNode  && bestValue > oldAlpha        ? BOUND_LOWER : BOUND_NONE)
+                        | (InCheck || depth > DEPTH_QS_RECAPTURES ? BOUND_UPPER : BOUND_NONE));
+    if (bound != BOUND_NONE || !ttHit)
+        tte->save(posKey, value_to_tt(bestValue, ss->ply), bound,
+                  ttDepth, bestMove, ss->staticEval, TT.generation());
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
