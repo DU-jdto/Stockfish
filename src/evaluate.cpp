@@ -101,7 +101,7 @@ namespace {
     template<Color Us> Score evaluate_space();
     template<Color Us, PieceType Pt> Score evaluate_pieces();
     ScaleFactor evaluate_scale_factor(Value eg);
-    Score evaluate_initiative(Value eg);
+    Score evaluate_initiative(Value mg, Value eg);
 
     // Data members
     const Position& pos;
@@ -773,12 +773,13 @@ namespace {
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
     // that the endgame score will never change sign after the bonus.
-    int v = ((eg > 0) - (eg < 0)) * std::max(initiative, -abs(eg));
+    int vM = ((mg > 0) - (mg < 0)) * std::max(4 * pe->open_files() - 16, -abs(mg));
+    int vE = ((eg > 0) - (eg < 0)) * std::max(initiative               , -abs(eg));
 
     if (T)
-        Trace::add(INITIATIVE, make_score(0, v));
+        Trace::add(INITIATIVE, make_score(vM, vE));
 
-    return make_score(0, v);
+    return make_score(vM, vE);
   }
 
 
