@@ -325,7 +325,7 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
-        mobility[Us] += MobilityBonus[Pt - 2][mob];
+        mobility[Us] += (MobilityBonus[Pt - 2][mob] * 4 + MobilityBonus[Pt - 2][popcount(attacks_bb(Pt, s, pos.pieces(PAWN)) & mobilityArea[Us])]) / 5;
 
         // Bonus for this piece as a king protector
         score += KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
