@@ -312,18 +312,14 @@ Move MovePicker::next_move(bool skipQuiets) {
 
   case QSEARCH_RECAPTURES:
       cur = moves;
-      endMoves = generate<CAPTURES>(pos, cur);
+      endMoves = generate<RECAPTURES>(pos, cur, recaptureSquare);
       score<CAPTURES>();
       ++stage;
       /* fallthrough */
 
   case QRECAPTURES:
       while (cur < endMoves)
-      {
-          move = pick_best(cur++, endMoves);
-          if (to_sq(move) == recaptureSquare)
-              return move;
-      }
+          return pick_best(cur++, endMoves);
       break;
 
   default:
