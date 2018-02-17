@@ -743,16 +743,11 @@ namespace {
                    & ~attackedBy[Them][PAWN]
                    & (attackedBy[Us][ALL_PIECES] | ~attackedBy[Them][ALL_PIECES]);
 
-    // Find all squares which are at most three squares behind some friendly pawn
-    Bitboard behind = pos.pieces(Us, PAWN);
-    behind |= (Us == WHITE ? behind >>  8 : behind <<  8);
-    behind |= (Us == WHITE ? behind >> 16 : behind << 16);
-
     // Since SpaceMask[Us] is fully on our half of the board...
     assert(unsigned(safe >> (Us == WHITE ? 32 : 0)) == 0);
 
     // ...count safe + (behind & safe) with a single popcount.
-    int bonus = popcount((Us == WHITE ? safe << 32 : safe >> 32) | (behind & safe));
+    int bonus = popcount((Us == WHITE ? safe << 32 : safe >> 32) | (pe->territory_mask(Us) & safe));
     int weight = pos.count<ALL_PIECES>(Us) - 2 * pe->open_files();
 
     return make_score(bonus * weight * weight / 16, 0);
