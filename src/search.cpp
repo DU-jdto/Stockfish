@@ -665,12 +665,6 @@ namespace {
     if (skipEarlyPruning || !pos.non_pawn_material(pos.side_to_move()))
         goto moves_loop;
 
-    // Step 7. Razoring (skipped when in check)
-    if (   !PvNode
-        &&  depth <= ONE_PLY
-        &&  eval + RazorMargin <= alpha)
-        return qsearch<NonPV, false>(pos, ss, alpha, alpha+1);
-
     // Step 8. Futility pruning: child node (skipped when in check)
     if (   !rootNode
         &&  depth < 7 * ONE_PLY
