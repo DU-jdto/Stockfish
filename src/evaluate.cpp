@@ -181,6 +181,8 @@ namespace {
   const Score WeakQueen         = S( 50, 10);
   const Score WeakUnopposedPawn = S(  5, 25);
 
+  const Score Tempo = S(30, 20);
+
 #undef S
 
   // Evaluation class computes and stores attacks tables and other working data
@@ -831,7 +833,7 @@ namespace {
     // Initialize score by reading the incrementally updated scores included in
     // the position object (material + piece square tables) and the material
     // imbalance. Score is computed internally from the white point of view.
-    Score score = pos.psq_score() + me->imbalance() + Eval::Contempt;
+    Score score = pos.psq_score() + me->imbalance() + Eval::Contempt + (pos.side_to_move() == WHITE ? Tempo : -Tempo);
 
     // Probe the pawn hash table
     pe = Pawns::probe(pos);
@@ -879,8 +881,7 @@ namespace {
         Trace::add(TOTAL, score);
     }
 
-    return  (pos.side_to_move() == WHITE ? v : -v) // Side to move point of view
-           + Eval::Tempo;
+    return pos.side_to_move() == WHITE ? v : -v; // Side to move point of view
   }
 
 } // namespace
