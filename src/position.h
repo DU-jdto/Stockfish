@@ -156,6 +156,7 @@ public:
   Score psq_score() const;
   Value non_pawn_material(Color c) const;
   Value non_pawn_material() const;
+  bool king_has_moves(Color c) const;
 
   // Position consistency check, for debugging
   bool pos_is_ok() const;

@@ -455,6 +455,23 @@ const string Position::fen() const {
 }
 
 
+/// Position::king_has_moves() tests whether the chosen side's king has any legal
+/// moves.
+
+bool Position::king_has_moves(Color c) const {
+
+  // Assuming that we're not in check makes this more straightforward.
+  assert(!checkers());
+
+  Bitboard b = attacks_from<KING>(square<KING>(c)) & ~pieces(c);
+  while (b)
+      if (!(attackers_to(pop_lsb(&b)) & pieces(~c)))
+          return true;
+
+  return false;
+}
+
+
 /// Position::slider_blockers() returns a bitboard of all the pieces (both colors)
 /// that are blocking attacks on the square 's' from 'sliders'. A piece blocks a
 /// slider if removing that piece from the board would result in a position where

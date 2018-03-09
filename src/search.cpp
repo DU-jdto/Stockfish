@@ -713,7 +713,8 @@ namespace {
     if (   !PvNode
         &&  eval >= beta
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
-        && (ss->ply >= thisThread->nmp_ply || ss->ply % 2 != thisThread->nmp_odd))
+        && (ss->ply >= thisThread->nmp_ply || ss->ply % 2 != thisThread->nmp_odd)
+        && (depth / ONE_PLY <= pos.count<ALL_PIECES>() || pos.king_has_moves(pos.side_to_move())))
     {
         assert(eval - beta >= 0);
 
