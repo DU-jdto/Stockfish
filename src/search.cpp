@@ -879,6 +879,8 @@ moves_loop: // When in check, search starts from here
 
           if (value < rBeta)
               extension = ONE_PLY;
+
+          ss->moveCount = moveCount;
       }
       else if (    givesCheck // Check extension
                && !moveCountPruning
