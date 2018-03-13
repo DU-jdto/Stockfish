@@ -117,7 +117,7 @@ public:
   MovePicker(const Position&, Move, Value, const CapturePieceToHistory*);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*,  const CapturePieceToHistory*, Square);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const CapturePieceToHistory*, const PieceToHistory**, Move, Move*);
-  Move next_move(bool skipQuiets = false);
+  Move next_move();
 
 private:
   template<GenType> void score();

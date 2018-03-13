@@ -139,7 +139,7 @@ void MovePicker::score() {
 /// left. It picks the move with the biggest value from a list of generated moves
 /// taking care not to return the ttMove if it has already been searched.
 
-Move MovePicker::next_move(bool skipQuiets) {
+Move MovePicker::next_move() {
 
   Move move;
 
@@ -210,16 +210,15 @@ begin_switch:
       /* fallthrough */
 
   case QUIET:
-      if (!skipQuiets)
-          while (cur < endMoves)
-          {
-              move = *cur++;
-              if (   move != ttMove
-                  && move != refutations[0]
-                  && move != refutations[1]
-                  && move != refutations[2])
-                  return move;
-          }
+      while (cur < endMoves)
+      {
+          move = *cur++;
+          if (   move != ttMove
+              && move != refutations[0]
+              && move != refutations[1]
+              && move != refutations[2])
+              return move;
+      }
       ++stage;
       cur = moves; // Point to beginning of bad captures
       /* fallthrough */
