@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "search.h"
 
 namespace {
 
@@ -210,16 +211,16 @@ begin_switch:
       /* fallthrough */
 
   case QUIET:
-      if (!skipQuiets)
-          while (cur < endMoves)
-          {
-              move = *cur++;
-              if (   move != ttMove
-                  && move != refutations[0]
-                  && move != refutations[1]
-                  && move != refutations[2])
-                  return move;
-          }
+      while (cur < endMoves)
+      {
+          move = *cur++;
+          if (    move != ttMove
+              &&  move != refutations[0]
+              &&  move != refutations[1]
+              &&  move != refutations[2]
+              && (!skipQuiets || Search::gives_check(pos, move)))
+              return move;
+      }
       ++stage;
       cur = moves; // Point to beginning of bad captures
       /* fallthrough */
