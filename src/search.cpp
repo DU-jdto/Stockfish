@@ -707,7 +707,7 @@ namespace {
         &&  depth < 7 * ONE_PLY
         &&  eval - futility_margin(depth, improving) >= beta
         &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
-        return eval;
+        return eval - futility_margin(depth, improving);
 
     // Step 9. Null move search with verification search
     if (   !PvNode
