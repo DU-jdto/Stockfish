@@ -901,7 +901,8 @@ moves_loop: // When in check, search starts from here
               // Move count based pruning
               if (moveCountPruning)
               {
-                  skipQuiets = true;
+                  if (!inCheck && ss->staticEval < alpha)
+                      skipQuiets = true;
                   continue;
               }
 
