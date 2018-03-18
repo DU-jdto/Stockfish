@@ -703,7 +703,7 @@ namespace {
             Value v = qsearch<NonPV>(pos, ss, ralpha, ralpha+1);
 
             if (v <= ralpha)
-                return v;
+                return v + RazorMargin2;
         }
     }
 
@@ -712,7 +712,7 @@ namespace {
         &&  depth < 7 * ONE_PLY
         &&  eval - futility_margin(depth, improving) >= beta
         &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
-        return eval;
+        return eval - futility_margin(depth, improving);
 
     // Step 9. Null move search with verification search
     if (   !PvNode
@@ -793,7 +793,7 @@ namespace {
                 pos.undo_move(move);
 
                 if (value >= rbeta)
-                    return value;
+                    return beta + value - rbeta;
             }
     }
 
@@ -918,7 +918,10 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 7
                   && !inCheck
                   && ss->staticEval + 256 + 200 * lmrDepth <= alpha)
+              {
+                  bestValue = std::max(bestValue, ss->staticEval + 256 + 200 * lmrDepth);
                   continue;
+              }
 
               // Prune moves with negative SEE
               if (   lmrDepth < 8
