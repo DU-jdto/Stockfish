@@ -226,6 +226,8 @@ namespace {
     // and h6. It is set to 0 when king safety evaluation is skipped.
     Bitboard kingRing[COLOR_NB];
 
+    Bitboard kingRingExtended[COLOR_NB];
+
     // kingAttackersCount[color] is the number of pieces of the given color
     // which attack a square in the kingRing of the enemy king.
     int kingAttackersCount[COLOR_NB];
@@ -281,11 +283,13 @@ namespace {
         else if (file_of(pos.square<KING>(Us)) == FILE_A)
             kingRing[Us] |= shift<EAST>(kingRing[Us]);
 
+        kingRingExtended[Us] = shift<WEST>(kingRing[Us]) | shift<EAST>(kingRing[Us]) | shift<NORTH>(kingRing[Us]) | shift<SOUTH>(kingRing[Us]);
+
         kingAttackersCount[Them] = popcount(attackedBy[Us][KING] & pe->pawn_attacks(Them));
         kingAttacksCount[Them] = kingAttackersWeight[Them] = 0;
     }
     else
-        kingRing[Us] = kingAttackersCount[Them] = 0;
+        kingRing[Us] = kingRingExtended[Us] = kingAttackersCount[Them] = 0;
   }
 
 
@@ -318,11 +322,14 @@ namespace {
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
 
-        if (b & kingRing[Them])
+        if (b & kingRingExtended[Them])
         {
             kingAttackersCount[Us]++;
-            kingAttackersWeight[Us] += KingAttackWeights[Pt];
-            kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
+            if (b & kingRing[Them])
+            {
+                kingAttackersWeight[Us] += KingAttackWeights[Pt];
+                kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
+            }
         }
 
         int mob = popcount(b & mobilityArea[Us]);
