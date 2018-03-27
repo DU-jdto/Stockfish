@@ -894,7 +894,8 @@ moves_loop: // When in check, search starts from here
               if (moveCountPruning)
               {
                   skipQuiets = true;
-                  continue;
+                  if (!mp.is_refutation(move))
+                      continue;
               }
 
               // Reduced depth of the next LMR search

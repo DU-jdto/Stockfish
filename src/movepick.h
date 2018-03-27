@@ -120,6 +120,7 @@ public:
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*,  const CapturePieceToHistory*, Square);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const CapturePieceToHistory*, const PieceToHistory**, Move, Move*);
   Move next_move(bool skipQuiets = false);
+  bool is_refutation(Move m) const { return m == refutations[0] || m == refutations[1] || m == refutations[2]; }
 
 private:
   template<PickType T, typename Pred> Move select(Pred);
