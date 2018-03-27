@@ -902,6 +902,7 @@ moves_loop: // When in check, search starts from here
 
               // Countermoves based pruning
               if (   lmrDepth < 3
+                  && !mp.is_refutation(move)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
                   continue;
