@@ -181,6 +181,11 @@ constexpr Bitboard pawn_attacks_bb(Bitboard b) {
                     : shift<SOUTH_WEST>(b) | shift<SOUTH_EAST>(b);
 }
 
+constexpr Bitboard pawn_attacks_bb(Color c, Bitboard b) {
+  return c == WHITE ? pawn_attacks_bb<WHITE>(b)
+                    : pawn_attacks_bb<BLACK>(b);
+}
+
 
 /// adjacent_files_bb() returns a bitboard representing all the squares on the
 /// adjacent files of the given one.

@@ -513,6 +513,7 @@ namespace {
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
+    Bitboard pawnThreats;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
 
@@ -820,6 +821,7 @@ moves_loop: // When in check, search starts from here
     skipQuiets = false;
     ttCapture = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
+    pawnThreats = pawn_attacks_bb(~pos.side_to_move(), pos.pieces(~pos.side_to_move(), PAWN)) & (pos.pieces(pos.side_to_move()) ^ pos.pieces(pos.side_to_move(), PAWN));
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
@@ -888,6 +890,7 @@ moves_loop: // When in check, search starts from here
       {
           if (   !captureOrPromotion
               && !givesCheck
+              && !(pawnThreats & from_sq(move))
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning
