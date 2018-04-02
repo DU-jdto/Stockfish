@@ -95,7 +95,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Value th, const CapturePiece
   stage = PROBCUT_TT;
   ttMove =   ttm
           && pos.pseudo_legal(ttm)
-          && pos.capture(ttm)
+          && pos.capture_or_promotion(ttm)
           && pos.see_ge(ttm, threshold) ? ttm : MOVE_NONE;
   stage += (ttMove == MOVE_NONE);
 }
