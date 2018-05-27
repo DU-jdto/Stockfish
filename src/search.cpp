@@ -945,8 +945,8 @@ moves_loop: // When in check, search starts from here
 
               // Countermoves based pruning (~20 Elo)
               if (   lmrDepth < 3
-                  && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+                  && (*contHist[0])[movedPiece][to_sq(move)]                                           < CounterMovePruneThreshold
+                  && (*contHist[1])[movedPiece][to_sq(move)] + (*contHist[3])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
                   continue;
 
               // Futility pruning: parent node (~2 Elo)
