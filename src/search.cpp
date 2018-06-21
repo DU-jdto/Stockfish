@@ -722,7 +722,7 @@ namespace {
         Value ralpha = alpha - (depth >= 2 * ONE_PLY) * RazorMargin[depth / ONE_PLY];
         Value v = qsearch<NonPV>(pos, ss, ralpha, ralpha+1);
         if (depth < 2 * ONE_PLY || v <= ralpha)
-            return v;
+            return v + alpha - ralpha;
     }
 
     improving =   ss->staticEval >= (ss-2)->staticEval
@@ -733,7 +733,7 @@ namespace {
         &&  depth < 7 * ONE_PLY
         &&  eval - futility_margin(depth, improving) >= beta
         &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
-        return eval;
+        return eval - futility_margin(depth, improving);
 
     // Step 9. Null move search with verification search (~40 Elo)
     if (   !PvNode
@@ -775,11 +775,11 @@ namespace {
             thisThread->nmpMinPly = ss->ply + 3 * (depth-R) / 4;
             thisThread->nmpColor = us;
 
-            Value v = search<NonPV>(pos, ss, beta-1, beta, depth-R, false);
+            Value v = search<NonPV>(pos, ss, nullValue-1, nullValue, depth-R, false);
 
             thisThread->nmpMinPly = 0;
 
-            if (v >= beta)
+            if (v >= nullValue)
                 return nullValue;
         }
     }
@@ -818,7 +818,7 @@ namespace {
                 pos.undo_move(move);
 
                 if (value >= rbeta)
-                    return value;
+                    return value + beta - rbeta;
             }
     }
 
@@ -944,7 +944,10 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 7
                   && !inCheck
                   && ss->staticEval + 256 + 200 * lmrDepth <= alpha)
+              {
+                  bestValue = std::max(bestValue, ss->staticEval + 256 + 200 * lmrDepth);
                   continue;
+              }
 
               // Prune moves with negative SEE (~10 Elo)
               if (!pos.see_ge(move, Value(-29 * lmrDepth * lmrDepth)))
