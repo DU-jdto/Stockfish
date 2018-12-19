@@ -154,7 +154,7 @@ public:
   bool has_game_cycle(int ply) const;
   bool has_repeated() const;
   int rule50_count() const;
-  Score psq_score() const;
+  Score psq_score(int idx) const;
   Value non_pawn_material(Color c) const;
   Value non_pawn_material() const;
 
@@ -187,7 +187,7 @@ private:
   Bitboard castlingPath[CASTLING_RIGHT_NB];
   int gamePly;
   Color sideToMove;
-  Score psq;
+  Score psq[2*COLOR_NB];
   Thread* thisThread;
   StateInfo* st;
   bool chess960;
@@ -330,8 +330,8 @@ inline Key Position::material_key() const {
   return st->materialKey;
 }
 
-inline Score Position::psq_score() const {
-  return psq;
+inline Score Position::psq_score(int idx) const {
+  return psq[idx];
 }
 
 inline Value Position::non_pawn_material(Color c) const {
@@ -388,7 +388,8 @@ inline void Position::put_piece(Piece pc, Square s) {
   index[s] = pieceCount[pc]++;
   pieceList[pc][index[s]] = s;
   pieceCount[make_piece(color_of(pc), ALL_PIECES)]++;
-  psq += PSQT::psq[pc][s];
+  psq[color_of(pc) << 1] += PSQT::psq[pc][s];
+  psq[(color_of(pc) << 1) + 1] += PSQT::psq[pc][make_square(~file_of(s), rank_of(s))];
 }
 
 inline void Position::remove_piece(Piece pc, Square s) {
@@ -406,7 +407,8 @@ inline void Position::remove_piece(Piece pc, Square s) {
   pieceList[pc][index[lastSquare]] = lastSquare;
   pieceList[pc][pieceCount[pc]] = SQ_NONE;
   pieceCount[make_piece(color_of(pc), ALL_PIECES)]--;
-  psq -= PSQT::psq[pc][s];
+  psq[color_of(pc) << 1] -= PSQT::psq[pc][s];
+  psq[(color_of(pc) << 1) + 1] -= PSQT::psq[pc][make_square(~file_of(s), rank_of(s))];
 }
 
 inline void Position::move_piece(Piece pc, Square from, Square to) {
@@ -421,7 +423,8 @@ inline void Position::move_piece(Piece pc, Square from, Square to) {
   board[to] = pc;
   index[to] = index[from];
   pieceList[pc][index[to]] = to;
-  psq += PSQT::psq[pc][to] - PSQT::psq[pc][from];
+  psq[color_of(pc) << 1] += PSQT::psq[pc][to] - PSQT::psq[pc][from];
+  psq[(color_of(pc) << 1) + 1] += PSQT::psq[pc][make_square(~file_of(to), rank_of(to))] - PSQT::psq[pc][make_square(~file_of(from), rank_of(from))];
 }
 
 inline void Position::do_move(Move m, StateInfo& newSt) {
