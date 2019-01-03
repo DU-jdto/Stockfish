@@ -1307,7 +1307,7 @@ moves_loop: // When in check, search starts from here
                                              : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
         // Stand pat. Return immediately if static value is at least beta
-        if (bestValue >= beta)
+        if (bestValue >= beta || depth <= DEPTH_QS_SKIP)
         {
             if (!ttHit)
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), BOUND_LOWER,
@@ -1330,8 +1330,7 @@ moves_loop: // When in check, search starts from here
     // be generated.
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
-                                      contHist,
-                                      to_sq((ss-1)->currentMove));
+                                      contHist);
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move()) != MOVE_NONE)
